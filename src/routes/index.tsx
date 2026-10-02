@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { Hero } from "@/components/gift/Hero";
@@ -9,6 +8,7 @@ import { Footer } from "@/components/gift/Footer";
 import { Retail } from "@/components/gift/Retail";
 
 const title = "Gifting an Experience | De LUSH Resort, Bavdhan Pune";
+
 const description =
   "Gift a night away at De LUSH Resort, Bavdhan, Pune. Curated stay, dining and spa gift packages from ₹3,999 for birthdays, anniversaries and festivals.";
 
@@ -27,20 +27,6 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  useEffect(() => {
-    window.history.scrollRestoration = "manual";
-
-    if (window.location.hash) {
-      window.history.replaceState(
-        null,
-        "",
-        window.location.pathname + window.location.search
-      );
-    }
-
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
     <main className="overflow-x-hidden">
       <Hero />
@@ -49,7 +35,11 @@ function Index() {
       <Gallery />
       <EnquiryForm />
       <Footer />
-      <Toaster position="top-center" richColors />
+
+      <Toaster
+        position="top-center"
+        richColors
+      />
     </main>
   );
 }
