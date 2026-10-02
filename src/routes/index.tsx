@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { Hero } from "@/components/gift/Hero";
@@ -6,7 +7,6 @@ import { Gallery } from "@/components/gift/Gallery";
 import { EnquiryForm } from "@/components/gift/EnquiryForm";
 import { Footer } from "@/components/gift/Footer";
 import { Retail } from "@/components/gift/Retail";
-
 
 const title = "Gifting an Experience | De LUSH Resort, Bavdhan Pune";
 const description =
@@ -27,6 +27,20 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  useEffect(() => {
+    window.history.scrollRestoration = "manual";
+
+    if (window.location.hash) {
+      window.history.replaceState(
+        null,
+        "",
+        window.location.pathname + window.location.search
+      );
+    }
+
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <main className="overflow-x-hidden">
       <Hero />

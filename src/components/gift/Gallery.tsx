@@ -1,46 +1,60 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
-import image1 from "@/assets/1.jpg";
-import image2 from "@/assets/2.jpg";
-import image3 from "@/assets/3.jpg";
-import image4 from "@/assets/4.jpg";
-import image5 from "@/assets/5.jpg";
-import image6 from "@/assets/6.jpg";
-import image7 from "@/assets/7.jpg";
-import image8 from "@/assets/8.jpg";
-import image9 from "@/assets/9.jpg";
-import image10 from "@/assets/10.jpg";
-import image11 from "@/assets/11.jpg";
-import image12 from "@/assets/12.jpg";
-import image13 from "@/assets/13.jpg";
-import image14 from "@/assets/14.jpg";
-import image15 from "@/assets/15.jpg";
-import image16 from "@/assets/16.jpg";
-import image17 from "@/assets/17.jpg";
-import image18 from "@/assets/18.jpg";
+import suite from "@/assets/3.jpg";
+import dining from "@/assets/1.jpg";
+import spa from "@/assets/16.jpg";
+import hightea from "@/assets/10.jpg";
+import voucher from "@/assets/15.jpg";
+import pool from "@/assets/8.jpg";
+import couple from "@/assets/12.jpg";
+import breakfast from "@/assets/4.jpg";
+import garden from "@/assets/13.jpg";
+import hero from "@/assets/14.jpg";
 
 import { Reveal } from "./Reveal";
 
 const images = [
-  { src: image1, caption: "De LUSH Experience" },
-  { src: image2, caption: "Luxury Stay" },
-  { src: image3, caption: "Elegant Interiors" },
-  { src: image4, caption: "Breakfast Experience" },
-  { src: image5, caption: "Resort Experience" },
-  { src: image6, caption: "Premium Hospitality" },
-  { src: image7, caption: "Relax & Unwind" },
-  { src: image8, caption: "Poolside Experience" },
-  { src: image9, caption: "Luxury Suite" },
-  { src: image10, caption: "High Tea Experience" },
-  { src: image11, caption: "Wellness Experience" },
-  { src: image12, caption: "A Moment Together" },
-  { src: image13, caption: "Lush Surroundings" },
-  { src: image14, caption: "De LUSH Resort" },
-  { src: image15, caption: "Gift Experience" },
-  { src: image16, caption: "Dining Experience" },
-  { src: image17, caption: "Premium Escape" },
-  { src: image18, caption: "Memories at De LUSH" },
+  {
+    src: suite,
+    caption: "Luxury suite experience",
+  },
+  {
+    src: dining,
+    caption: "Dining experience",
+  },
+  {
+    src: hightea,
+    caption: "High tea experience",
+  },
+  {
+    src: spa,
+    caption: "Unique spa experience",
+  },
+  {
+    src: hero,
+    caption: "A night away at De LUSH",
+  },
+  {
+    src: couple,
+    caption: "Moments worth remembering",
+  },
+  {
+    src: breakfast,
+    caption: "Slow mornings",
+  },
+  {
+    src: voucher,
+    caption: "The De LUSH Gift Voucher",
+  },
+  {
+    src: pool,
+    caption: "Poolside relaxation",
+  },
+  {
+    src: garden,
+    caption: "Peaceful surroundings",
+  },
 ];
 
 export function Gallery() {
@@ -62,11 +76,12 @@ export function Gallery() {
     setOpen(null);
   }, []);
 
+  // Open fullscreen image
   const openImage = useCallback((index: number) => {
     setOpen(index);
   }, []);
 
-  // Keyboard navigation for fullscreen gallery
+  // Fullscreen keyboard navigation
   useEffect(() => {
     if (open === null) return;
 
@@ -83,9 +98,7 @@ export function Gallery() {
 
       if (e.key === "ArrowLeft") {
         setOpen((i) =>
-          i === null
-            ? i
-            : (i - 1 + images.length) % images.length,
+          i === null ? i : (i - 1 + images.length) % images.length,
         );
       }
     };
@@ -101,20 +114,33 @@ export function Gallery() {
     };
   }, [open, close]);
 
-  // Keep active slide centered
+  /*
+   * Keep the selected slide centered.
+   *
+   * IMPORTANT:
+   * Do NOT use slide.scrollIntoView() here.
+   * scrollIntoView() can scroll the entire page vertically
+   * and cause the browser to jump down to the Gallery section.
+   *
+   * Instead, we only scroll the horizontal gallery container.
+   */
   useEffect(() => {
     if (!sliderRef.current) return;
 
     const container = sliderRef.current;
-    const slide = container.children[current] as HTMLElement;
+    const slide = container.children[current] as HTMLElement | undefined;
 
-    if (slide) {
-      slide.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center",
-      });
-    }
+    if (!slide) return;
+
+    const targetScrollLeft =
+      slide.offsetLeft -
+      container.clientWidth / 2 +
+      slide.clientWidth / 2;
+
+    container.scrollTo({
+      left: Math.max(0, targetScrollLeft),
+      behavior: "smooth",
+    });
   }, [current]);
 
   return (
@@ -142,22 +168,13 @@ export function Gallery() {
 
           {/* Previous */}
           <button
-            type="button"
             onClick={prev}
             aria-label="Previous image"
             className="
-              glass-dark
-              absolute
-              left-2
-              top-1/2
-              z-20
-              -translate-y-1/2
-              rounded-full
-              p-3
-              text-primary-foreground
-              shadow-lg
-              transition-all
-              duration-300
+              glass-dark absolute left-2 top-1/2 z-20
+              -translate-y-1/2 rounded-full p-3
+              text-primary-foreground shadow-lg
+              transition-all duration-300
               hover:scale-110
               sm:left-4
             "
@@ -170,8 +187,7 @@ export function Gallery() {
             ref={sliderRef}
             className="
               flex
-              snap-x
-              snap-mandatory
+              snap-x snap-mandatory
               gap-5
               overflow-x-auto
               scroll-smooth
@@ -181,24 +197,28 @@ export function Gallery() {
               [&::-webkit-scrollbar]:hidden
             "
             onTouchStart={(e) => {
-              touchX.current = e.touches[0]?.clientX ?? null;
+              touchX.current = e.touches[0].clientX;
             }}
             onTouchEnd={(e) => {
               if (touchX.current === null) return;
 
               const dx =
-                (e.changedTouches[0]?.clientX ?? touchX.current) -
-                touchX.current;
+                e.changedTouches[0].clientX - touchX.current;
 
-              if (dx < -50) next();
-              if (dx > 50) prev();
+              if (dx < -50) {
+                next();
+              }
+
+              if (dx > 50) {
+                prev();
+              }
 
               touchX.current = null;
             }}
           >
             {images.map((img, index) => (
               <div
-                key={index}
+                key={`${img.src}-${index}`}
                 className="
                   group
                   relative
@@ -211,7 +231,6 @@ export function Gallery() {
                 "
               >
                 <button
-                  type="button"
                   onClick={() => openImage(index)}
                   aria-label={`Open ${img.caption}`}
                   className="
@@ -227,7 +246,7 @@ export function Gallery() {
                   <img
                     src={img.src}
                     alt={img.caption}
-                    loading={index < 3 ? "eager" : "lazy"}
+                    loading="lazy"
                     className="
                       h-full
                       w-full
@@ -277,26 +296,6 @@ export function Gallery() {
                   >
                     {img.caption}
                   </span>
-
-                  {/* Image Number */}
-                  <span
-                    className="
-                      pointer-events-none
-                      absolute
-                      right-5
-                      top-5
-                      rounded-full
-                      bg-black/30
-                      px-3
-                      py-1
-                      text-[0.65rem]
-                      tracking-[0.15em]
-                      text-white
-                      backdrop-blur-sm
-                    "
-                  >
-                    {String(index + 1).padStart(2, "0")} / 18
-                  </span>
                 </button>
               </div>
             ))}
@@ -304,22 +303,13 @@ export function Gallery() {
 
           {/* Next */}
           <button
-            type="button"
             onClick={next}
             aria-label="Next image"
             className="
-              glass-dark
-              absolute
-              right-2
-              top-1/2
-              z-20
-              -translate-y-1/2
-              rounded-full
-              p-3
-              text-primary-foreground
-              shadow-lg
-              transition-all
-              duration-300
+              glass-dark absolute right-2 top-1/2 z-20
+              -translate-y-1/2 rounded-full p-3
+              text-primary-foreground shadow-lg
+              transition-all duration-300
               hover:scale-110
               sm:right-4
             "
@@ -329,11 +319,10 @@ export function Gallery() {
         </div>
 
         {/* Dots */}
-        <div className="mt-6 flex flex-wrap justify-center gap-2 px-8">
+        <div className="mt-6 flex justify-center gap-2">
           {images.map((_, index) => (
             <button
               key={index}
-              type="button"
               onClick={() => setCurrent(index)}
               aria-label={`Go to image ${index + 1}`}
               className={`
@@ -373,14 +362,13 @@ export function Gallery() {
           aria-modal="true"
           onClick={close}
           onTouchStart={(e) => {
-            touchX.current = e.touches[0]?.clientX ?? null;
+            touchX.current = e.touches[0].clientX;
           }}
           onTouchEnd={(e) => {
             if (touchX.current === null) return;
 
             const dx =
-              (e.changedTouches[0]?.clientX ?? touchX.current) -
-              touchX.current;
+              e.changedTouches[0].clientX - touchX.current;
 
             if (dx < -50) {
               setOpen(
@@ -396,8 +384,7 @@ export function Gallery() {
                 (i) =>
                   i === null
                     ? i
-                    : (i - 1 + images.length) %
-                      images.length,
+                    : (i - 1 + images.length) % images.length,
               );
             }
 
@@ -406,14 +393,13 @@ export function Gallery() {
         >
           {/* Close */}
           <button
-            type="button"
             onClick={close}
             aria-label="Close gallery"
             className="
               absolute
               right-5
               top-5
-              z-30
+              z-20
               rounded-full
               p-3
               text-primary-foreground/80
@@ -426,7 +412,6 @@ export function Gallery() {
 
           {/* Previous */}
           <button
-            type="button"
             onClick={(e) => {
               e.stopPropagation();
 
@@ -434,8 +419,7 @@ export function Gallery() {
                 (i) =>
                   i === null
                     ? i
-                    : (i - 1 + images.length) %
-                      images.length,
+                    : (i - 1 + images.length) % images.length,
               );
             }}
             aria-label="Previous image"
@@ -443,7 +427,7 @@ export function Gallery() {
               glass-dark
               absolute
               left-4
-              z-30
+              z-20
               rounded-full
               p-3
               text-primary-foreground
@@ -453,15 +437,11 @@ export function Gallery() {
             <ChevronLeft className="size-6" />
           </button>
 
-          {/* Full Image */}
+          {/* Image */}
           <figure
             className="
-              flex
-              max-h-[90svh]
-              max-w-[95vw]
-              flex-col
-              items-center
-              justify-center
+              max-h-[85svh]
+              max-w-5xl
               animate-in
               zoom-in-95
               duration-300
@@ -472,8 +452,8 @@ export function Gallery() {
               src={images[open].src}
               alt={images[open].caption}
               className="
-                max-h-[80svh]
-                max-w-[92vw]
+                max-h-[75svh]
+                w-full
                 rounded-2xl
                 object-contain
               "
@@ -495,7 +475,6 @@ export function Gallery() {
 
           {/* Next */}
           <button
-            type="button"
             onClick={(e) => {
               e.stopPropagation();
 
@@ -511,7 +490,7 @@ export function Gallery() {
               glass-dark
               absolute
               right-4
-              z-30
+              z-20
               rounded-full
               p-3
               text-primary-foreground
